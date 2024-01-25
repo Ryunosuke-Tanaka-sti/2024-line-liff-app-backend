@@ -13,6 +13,8 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
 
+    environment: "production"
+
     outputs:
       image-name: ${{steps.build-name.outputs.container}}
 
@@ -25,7 +27,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.TOKEN_CLASSIC }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
