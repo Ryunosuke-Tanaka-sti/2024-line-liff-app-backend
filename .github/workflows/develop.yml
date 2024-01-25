@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     environment: "production"
+    env:
+      CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+      BOT_CHANNEL_ACCESS_TOKEN: ${{secrets.BOT_CHANNEL_ACCESS_TOKEN}}
+      BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
 
     outputs:
       image-name: ${{steps.build-name.outputs.container}}
