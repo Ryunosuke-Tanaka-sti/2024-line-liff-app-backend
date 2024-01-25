@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  nest:
+    build:
+      args:
+        - NODE_VER=20.10.0
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    volumes:
+      - ./backend:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    ports:
+      - "3000:3000"
+
+volumes:
+  node_modules:
