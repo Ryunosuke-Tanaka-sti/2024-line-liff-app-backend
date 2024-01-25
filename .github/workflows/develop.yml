@@ -26,6 +26,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create env file
+        run: |
+          touch .env
+          echo "CHANNEL_ID=${{env.CHANNEL_ID}}" >> .env
+          echo "BOT_CHANNEL_ACCESS_TOKEN=${{env.BOT_CHANNEL_ACCESS_TOKEN}}" >> .env
+          echo "BOT_CHANNEL_SECRET=${{env.BOT_CHANNEL_SECRET}}" >> .env
+          mv .env backend/.env
+
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
