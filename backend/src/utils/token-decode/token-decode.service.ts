@@ -4,7 +4,7 @@ import { EnvironmentsService } from 'src/config/enviroments.service';
 @Injectable()
 export class TokenDecodeService {
   constructor(private readonly enviromentService: EnvironmentsService) {}
-  async decodeIdToken(idToken: string): Promise<string> {
+  async decodeUserID(idToken: string): Promise<string> {
     try {
       const response = await fetch('https://api.line.me/oauth2/v2.1/verify', {
         method: 'POST',
