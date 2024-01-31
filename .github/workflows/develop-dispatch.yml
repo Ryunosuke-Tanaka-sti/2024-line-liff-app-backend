@@ -1,0 +1,89 @@
+#
+name: Development Dispatch CI
+
+# Configures this workflow to run every time a change is pushed to the branch called `release`.
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+
+    environment: "production"
+    env:
+      NODE_VERSION: "20.x"
+      CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+      BOT_CHANNEL_ACCESS_TOKEN: ${{secrets.BOT_CHANNEL_ACCESS_TOKEN}}
+      BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
+
+    outputs:
+      image-name: ${{steps.build-name.outputs.container}}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{env.NODE_VERSION}}
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: npm install node_modules
+        run: npm install
+        working-directory: backend
+
+      - name: Create env file
+        run: |
+          touch .env
+          echo "CHANNEL_ID=${{env.CHANNEL_ID}}" >> .env
+          echo "BOT_CHANNEL_ACCESS_TOKEN=${{env.BOT_CHANNEL_ACCESS_TOKEN}}" >> .env
+          echo "BOT_CHANNEL_SECRET=${{env.BOT_CHANNEL_SECRET}}" >> .env
+          mv .env backend/.env
+
+      - name: npm build
+        run: npm run build
+        working-directory: backend
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.TOKEN_CLASSIC }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: ${{ github.sha }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          file: ./Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: build container name
+        id: build-name
+        run: |
+          echo "container=${{steps.meta.outputs.tags}}" >> $GITHUB_OUTPUT
+
+  deploy-to-webapps:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-image]
+    environment: "production"
+    steps:
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: "line-liff-backend"
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: "${{needs.build-and-push-image.outputs.image-name}}"
