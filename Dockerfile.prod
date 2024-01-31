@@ -8,4 +8,4 @@ COPY --chown=node:node backend/dist .
 
 EXPOSE 3000
 
-ENTRYPOINT ["node", "dist/main.js"]
+ENTRYPOINT ["node", "main.js"]
