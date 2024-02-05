@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: "20.x"
 
 jobs:
   build-app:
@@ -15,7 +16,6 @@ jobs:
 
     environment: "production"
     env:
-      NODE_VERSION: "20.x"
       CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
       BOT_CHANNEL_ACCESS_TOKEN: ${{secrets.BOT_CHANNEL_ACCESS_TOKEN}}
       BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
@@ -58,34 +58,28 @@ jobs:
         run: npm run build
         working-directory: backend
 
-      - name: Upload artifact app
-        uses: actions/upload-artifact@v4
+      - name: Upload Cache app
+        uses: actions/cache@v4
         with:
-          name: dist-production
-          path: |
-            backend/dist/
+          path: backend/dist/
+          key: ${{ runner.os }}-app-${{ github.sha }}
 
   build-and-push-image:
     runs-on: ubuntu-latest
     needs: "build-app"
-
     environment: "production"
-
     outputs:
       image-name: ${{steps.build-name.outputs.container}}
-    env:
-      NODE_VERSION: "20.x"
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download app
-        uses: actions/download-artifact@v4
+      - name: Download Cache app
+        uses: actions/cache@v4
         with:
-          name: dist-production
-          path: ${{github.workspace}}/backend/dist/
-          merge-multiple: true
+          path: backend/dist/
+          key: ${{ runner.os }}-app-${{ github.sha }}
 
       - uses: actions/setup-node@v4
         with:
@@ -93,12 +87,12 @@ jobs:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
 
-      - name: npm install node_modules
+      - name: npm install production
         run: npm install --production
         working-directory: backend
 
       - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -106,13 +100,13 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: ${{ github.sha }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.prod
