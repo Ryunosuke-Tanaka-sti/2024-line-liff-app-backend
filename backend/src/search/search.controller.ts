@@ -4,7 +4,7 @@ import { UtilityFilter } from './dto/requeat.dto';
 import { ResponseUserManagerDto, ResponseUserQualificationDto, ResponseUserSkillDto } from './dto/response.dto';
 import { SearchService } from './search.service';
 
-@Controller('api/search')
+@Controller('/api/search')
 @UseGuards(GoogleIdTokenVerifyGuard)
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}

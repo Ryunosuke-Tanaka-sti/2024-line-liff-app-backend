@@ -3,7 +3,7 @@ import { RequestCreateDto } from './dto/request.dto';
 import { ResponseAllType, ResponseIndividualType } from './dto/response.dto';
 import { UtilitieDataService } from './utilitie-data.service';
 
-@Controller('api/utilities')
+@Controller('/api/utilities')
 export class UtilitieDataController {
   constructor(private readonly service: UtilitieDataService) {}
 

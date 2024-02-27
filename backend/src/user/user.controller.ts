@@ -11,7 +11,7 @@ import {
 import { ResponseUserDto } from './dto/response.dto';
 import { UserService } from './user.service';
 
-@Controller('api/users')
+@Controller('/api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
