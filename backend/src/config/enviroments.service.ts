@@ -2,8 +2,9 @@ import { MessagingApiClient } from '@line/bot-sdk/dist/messaging-api/api';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { FirebaseOptions, initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { credential } from 'firebase-admin';
+import { App, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 @Injectable()
 export class EnvironmentsService {
@@ -27,18 +28,25 @@ export class EnvironmentsService {
     return new MessagingApiClient(token);
   }
 
-  FirebaseConfig: FirebaseOptions = {
-    apiKey: this.configService.get('FIREBASE_API_KEY'),
-    authDomain: this.configService.get('FIREBASE_AUTH_DOMAIN'),
-    projectId: this.configService.get('FIREBASE_PROJECT_ID'),
-    storageBucket: this.configService.get('FIREBASE_STORAGE_BUCKET'),
-    messagingSenderId: this.configService.get('FIREBASE_MESSAGING_SENDER_ID'),
-    appId: this.configService.get('FIREBASE_APP_ID'),
-    measurementId: this.configService.get('FIREBASE_MEASUREMENT_ID'),
-  };
+  private firebaseApp: App;
+  get firebaseAppInstance() {
+    if (this.firebaseApp) return this.firebaseApp;
+
+    this.firebaseApp = initializeApp({
+      credential: credential.cert({
+        projectId: this.configService.get('FIREBASE_PROJECT_ID'),
+        privateKey: this.configService
+          .get('FIREBASE_PRIVATE_KEY')
+          .split(String.raw`\n`)
+          .join('\n'),
+        clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
+      }),
+    });
+    return this.firebaseApp;
+  }
+
   get firestoreDB() {
-    const app = initializeApp(this.FirebaseConfig);
-    const db = getFirestore(app);
-    return db;
+    const DB = getFirestore(this.firebaseAppInstance);
+    return DB;
   }
 }

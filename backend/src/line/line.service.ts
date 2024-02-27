@@ -1,33 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import {
-  DocumentData,
-  FirestoreDataConverter,
-  QueryDocumentSnapshot,
-  SnapshotOptions,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+
+import { DocumentData, FieldValue, FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { EnvironmentsService } from 'src/config/enviroments.service';
 import type { todoType } from '../types/todoType';
 
 @Injectable()
 export class LineService {
   constructor(private readonly env: EnvironmentsService) {}
+  todoDB = this.env.firestoreDB.collection('todo');
 
   todoConverter: FirestoreDataConverter<todoType> = {
-    fromFirestore(snapshot: QueryDocumentSnapshot, options: SnapshotOptions): todoType {
-      const data = snapshot.data(options);
+    fromFirestore(snapshot: QueryDocumentSnapshot<DocumentData>): todoType {
       return {
         uid: snapshot.id,
-        userID: data.userID,
-        done: data.done,
-        text: data.text,
-        timestamp: data.timestamp.toDate(),
+        userID: snapshot.get('userID'),
+        text: snapshot.get('text'),
+        done: snapshot.get('done'),
+        timestamp: snapshot.get('timestamp'),
       };
     },
     toFirestore(todo: todoType): DocumentData {
@@ -35,32 +24,32 @@ export class LineService {
         userID: todo.userID,
         text: todo.text,
         done: todo.done,
-        timestamp: todo.timestamp ? todo.timestamp : serverTimestamp(),
+        timestamp: todo.timestamp,
       };
     },
   };
 
   createTodo = async (todo: Omit<todoType, 'uid' | 'timestamp'>): Promise<void> => {
-    const collRef = collection(this.env.firestoreDB, 'todo').withConverter(this.todoConverter);
-    await addDoc(collRef, todo);
+    const collRef = this.todoDB.withConverter(this.todoConverter);
+    await collRef.add({ uid: '', ...todo, timestamp: FieldValue.serverTimestamp() });
   };
 
   readTodo = async (): Promise<todoType[]> => {
-    const collRef = collection(this.env.firestoreDB, 'todo').withConverter(this.todoConverter);
-    const snapshot = await getDocs(collRef);
+    const collRef = this.todoDB.withConverter(this.todoConverter);
+    const snapshot = await collRef.get();
     const result = snapshot.docs.map((doc) => doc.data());
     return result;
   };
 
   updateTodo = async (todo: todoType): Promise<void> => {
-    const collRef = collection(this.env.firestoreDB, 'todo');
-    const docRef = doc(collRef, todo.uid);
-    await setDoc(docRef, todo);
+    const collRef = this.todoDB;
+    const docRef = collRef.doc(todo.uid).withConverter(this.todoConverter);
+    await docRef.update({ ...todo });
   };
 
   deleteTodo = async (uid: string): Promise<void> => {
-    const collRef = collection(this.env.firestoreDB, 'todo');
-    const docRef = doc(collRef, uid);
-    await deleteDoc(docRef);
+    const collRef = this.todoDB;
+    const docRef = collRef.doc(uid);
+    await docRef.delete();
   };
 }

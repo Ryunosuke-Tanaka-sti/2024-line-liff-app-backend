@@ -22,15 +22,29 @@ export class LineController {
   @Get('todo')
   // @UseGuards(IsLiffAuthenticatedGuard)
   async readTodo(): Promise<void> {
-    await this.lineService.readTodo();
+    const todos = await this.lineService.readTodo();
+    console.log(todos);
+    return;
+  }
+  @Get('todos')
+  // @UseGuards(IsLiffAuthenticatedGuard)
+  async readTodos(): Promise<void> {
+    await this.lineService.updateTodo({
+      uid: 'A06taCLxzsHHvy4g3Zdx',
+      userID: 'user',
+      text: 'user',
+      done: true,
+      timestamp: new Date(),
+    });
     return;
   }
 
   @Post('todo')
   // @UseGuards(IsLiffAuthenticatedGuard)
   async test(@Body() request: RequestLineTodoPostDto): Promise<void> {
-    // const userID = await this.tokenDecode.decodeUserID(request.idToekn);
     console.log(request);
+
+    // const userID = await this.tokenDecode.decodeUserID(request.idToekn);
     await this.lineService.createTodo({ userID: 'test', text: 'test', done: false });
     return;
   }

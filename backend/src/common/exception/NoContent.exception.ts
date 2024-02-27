@@ -5,9 +5,3 @@ export class NoContentException extends HttpException {
     super('No Content', HttpStatus.NO_CONTENT);
   }
 }
-
-export class UnauthorizedException extends HttpException {
-  constructor() {
-    super('Unauthorized', HttpStatus.UNAUTHORIZED);
-  }
-}
