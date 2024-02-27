@@ -34,9 +34,9 @@ export class EnvironmentsService {
 
     this.firebaseApp = initializeApp({
       credential: credential.cert({
-        projectId: this.configService.get('FIREBASE_PROJECT_ID'),
-        privateKey: this.configService.get('FIREBASE_PRIVATE_KEY'),
-        clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
+        projectId: String(this.configService.get('FIREBASE_PROJECT_ID')),
+        privateKey: String(this.configService.get('FIREBASE_PRIVATE_KEY')),
+        clientEmail: String(this.configService.get('FIREBASE_CLIENT_EMAIL')),
       }),
     });
     return this.firebaseApp;
