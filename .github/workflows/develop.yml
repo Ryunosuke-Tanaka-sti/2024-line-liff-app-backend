@@ -19,12 +19,9 @@ jobs:
       CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
       BOT_CHANNEL_ACCESS_TOKEN: ${{secrets.BOT_CHANNEL_ACCESS_TOKEN}}
       BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
-      FIREBASE_API_KEY: ${{secrets.FIREBASE_API_KEY}}
-      FIREBASE_AUTH_DOMAIN: ${{secrets.FIREBASE_AUTH_DOMAIN}}
       FIREBASE_PROJECT_ID: ${{secrets.FIREBASE_PROJECT_ID}}
-      FIREBASE_STORAGE_BUCKET: ${{secrets.FIREBASE_STORAGE_BUCKET}}
-      FIREBASE_MESSAGING_SENDER_ID: ${{secrets.FIREBASE_MESSAGING_SENDER_ID}}
-      FIREBASE_APP_ID: ${{secrets.FIREBASE_APP_ID}}
+      FIREBASE_PRIVATE_KEY: ${{secrets.FIREBASE_PRIVATE_KEY}}
+      FIREBASE_CLIENT_EMAIL: ${{secrets.FIREBASE_CLIENT_EMAIL}}
 
     steps:
       - name: Checkout repository
@@ -46,12 +43,9 @@ jobs:
           echo "CHANNEL_ID=${{env.CHANNEL_ID}}" >> .env
           echo "BOT_CHANNEL_ACCESS_TOKEN=${{env.BOT_CHANNEL_ACCESS_TOKEN}}" >> .env
           echo "BOT_CHANNEL_SECRET=${{env.BOT_CHANNEL_SECRET}}" >> .env
-          echo "FIREBASE_API_KEY=${{env.FIREBASE_API_KEY}}" >> .env
-          echo "FIREBASE_AUTH_DOMAIN=${{env.FIREBASE_AUTH_DOMAIN}}" >> .env
           echo "FIREBASE_PROJECT_ID=${{env.FIREBASE_PROJECT_ID}}" >> .env
-          echo "FIREBASE_STORAGE_BUCKET=${{env.FIREBASE_STORAGE_BUCKET}}" >> .env
-          echo "FIREBASE_MESSAGING_SENDER_ID=${{env.FIREBASE_MESSAGING_SENDER_ID}}" >> .env
-          echo "FIREBASE_APP_ID=${{env.FIREBASE_APP_ID}}" >> .env
+          echo "FIREBASE_PRIVATE_KEY=${{env.FIREBASE_PRIVATE_KEY}}" >> .env
+          echo "FIREBASE_CLIENT_EMAIL=${{env.FIREBASE_CLIENT_EMAIL}}" >> .env
           mv .env backend/.env
 
       - name: npm build
