@@ -7,7 +7,6 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get("/api")
-  @UseGuards(GoogleIdTokenVerifyGrantIdGuard)
   async getHello(@Body() request: { uid: string }): Promise<string> {
     console.log(`request ${request.uid}`);
     return this.appService.getHello();
