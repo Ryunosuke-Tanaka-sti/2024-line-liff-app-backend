@@ -22,6 +22,17 @@ export class EnvironmentsService {
     return this.configService.get('BOT_CHANNEL_SECRET');
   }
 
+  get FirebasePrivateKey(): string {
+    const privateKey: string = this.configService.get('FIREBASE_PRIVATE_KEY');
+    return privateKey.replace(/\\n/gm, '\n');
+  }
+  get FirebaseClientEmail(): string {
+    return this.configService.get('FIREBASE_CLIENT_EMAIL');
+  }
+  get FirebaseProjectID(): string {
+    return this.configService.get('FIREBASE_PROJECT_ID');
+  }
+
   ChannelAccessToken: string = this.configService.get('BOT_CHANNEL_ACCESS_TOKEN');
   createLinebotClient() {
     const token = { channelAccessToken: this.ChannelAccessToken };
@@ -34,9 +45,9 @@ export class EnvironmentsService {
 
     this.firebaseApp = initializeApp({
       credential: credential.cert({
-        projectId: String(this.configService.get('FIREBASE_PROJECT_ID')),
-        privateKey: String(this.configService.get('FIREBASE_PRIVATE_KEY')),
-        clientEmail: String(this.configService.get('FIREBASE_CLIENT_EMAIL')),
+        projectId: this.FirebaseProjectID,
+        privateKey: this.FirebasePrivateKey,
+        clientEmail: this.FirebaseClientEmail,
       }),
     });
     return this.firebaseApp;

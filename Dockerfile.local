@@ -4,7 +4,9 @@ FROM node:20.10.0
 USER node
 WORKDIR /home/node/app
 
-COPY --chown=node:node ./backend/node_modules/ ./node_modules/
+COPY --chown=node:node ./backend/package.json ./backend/package-lock.json ./
+RUN npm install
+
 COPY --chown=node:node ./backend/.env ./.env
 COPY --chown=node:node ./backend/dist ./dist/
 
