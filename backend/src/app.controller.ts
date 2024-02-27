@@ -6,7 +6,7 @@ import { GoogleIdTokenVerifyGrantIdGuard } from './common/guard/google-id-token-
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get("/api")
   @UseGuards(GoogleIdTokenVerifyGrantIdGuard)
   async getHello(@Body() request: { uid: string }): Promise<string> {
     console.log(`request ${request.uid}`);
