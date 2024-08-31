@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DocumentData, FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { EnvironmentsService } from 'src/config/enviroments.service';
-import { UtilitieDataService } from 'src/utilitie-data/utilitie-data.service';
+import { UtilitieDataService } from 'src/misc/feature/utilitie-data/utilitie-data.service';
 import { UserQualificationDataType } from './dto/common.type';
 import {
   RequestCreateDto,

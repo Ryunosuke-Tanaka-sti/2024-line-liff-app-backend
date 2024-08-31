@@ -3,7 +3,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { LineBotSignatureGuard } from 'src/common/guard/line-bot-signature/line-bot-signature.guard';
 import { LineBotService } from './line-bot.service';
 
-@Controller('line-bot')
+@Controller('/api/line-bot')
 export class LineBotController {
   constructor(private readonly botService: LineBotService) {}
 
@@ -17,7 +17,9 @@ export class LineBotController {
     if (event.type !== 'message' || event.message.type !== 'text') {
       return;
     }
-    this.botService.replyParrot(event.replyToken, event.message);
+    const userID = event.source.userId;
+    this.botService.replayAOAI(userID, event.replyToken, event.message);
+    // this.botService.replayImage(event.replyToken, event.message);
 
     return;
   }

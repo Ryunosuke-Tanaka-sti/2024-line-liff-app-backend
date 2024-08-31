@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { credential } from 'firebase-admin';
 import { App, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { AzureOpenAI } from 'openai';
 
 @Injectable()
 export class EnvironmentsService {
@@ -56,5 +57,42 @@ export class EnvironmentsService {
   get firestoreDB() {
     const DB = getFirestore(this.firebaseAppInstance);
     return DB;
+  }
+
+  get AOAIEndpoint(): string {
+    return this.configService.get('AOAI_ENDPOINT');
+  }
+  get AOAIKey(): string {
+    return this.configService.get('AOAI_API_KEY');
+  }
+  get AOAIApiVersion(): string {
+    return this.configService.get('AOAI_API_VERSION');
+  }
+
+  get AOAIDeploymentsID1(): string {
+    return this.configService.get('AOAI_DEPLOYMENT_ID01');
+  }
+
+  get AOAIDeploymentsID2(): string {
+    return this.configService.get('AOAI_DEPLOYMENT_ID02');
+  }
+
+  AOAIClientGPT4o() {
+    const client = new AzureOpenAI({
+      endpoint: this.AOAIEndpoint,
+      apiKey: this.AOAIKey,
+      apiVersion: this.AOAIApiVersion,
+      deployment: this.AOAIDeploymentsID1,
+    });
+    return client;
+  }
+  AOAIClientGPT35() {
+    const client = new AzureOpenAI({
+      endpoint: this.AOAIEndpoint,
+      apiKey: this.AOAIKey,
+      apiVersion: this.AOAIApiVersion,
+      deployment: this.AOAIDeploymentsID2,
+    });
+    return client;
   }
 }

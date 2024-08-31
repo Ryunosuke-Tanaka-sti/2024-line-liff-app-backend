@@ -1,55 +1,91 @@
 import { Injectable } from '@nestjs/common';
+import { LogService } from 'src/store/log/log.service';
+import { StoreEnemyService } from 'src/store/store-enemy/store-enemy.service';
 
-import { DocumentData, FieldValue, FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase-admin/firestore';
-import { EnvironmentsService } from 'src/config/enviroments.service';
-import type { todoType } from '../types/todoType';
+import { StoreUserService } from 'src/store/store-user/store-user.service';
+import { EnemyType } from 'src/types/enemyType';
+import { PromptResultType } from 'src/types/promptType';
+import { UserType } from 'src/types/userType';
+import { AoaiPromptService } from 'src/utils/aoai-prompt/aoai-prompt.service';
 
 @Injectable()
 export class LineService {
-  constructor(private readonly env: EnvironmentsService) {}
-  todoDB = this.env.firestoreDB.collection('todo');
+  constructor(
+    private readonly userStore: StoreUserService,
+    private readonly enemyStore: StoreEnemyService,
+    private readonly prompt: AoaiPromptService,
+    private readonly log: LogService,
+  ) {}
+  async isExistUser(uid: string) {
+    return this.userStore.isExistUser(uid);
+  }
+  async readUesr(uid: string) {
+    return this.userStore.getUser(uid);
+  }
+  async createUser(uid: string) {
+    const user: UserType = {
+      uid: uid,
+      winCount: 0,
+      lossCount: 0,
+      hotStreak: 0,
+    };
+    return this.userStore.createUser(uid, user);
+  }
 
-  todoConverter: FirestoreDataConverter<todoType> = {
-    fromFirestore(snapshot: QueryDocumentSnapshot<DocumentData>): todoType {
+  async getRandamEnemy(): Promise<EnemyType> {
+    const enemies = await this.enemyStore.getEnemyList();
+    //ランダムに一つ選ぶ
+    const enemy = enemies[Math.floor(Math.random() * enemies.length)];
+    return enemy;
+  }
+
+  async battlePrompt(uid: string, name: string, prompt: string): Promise<PromptResultType> {
+    const inputAOAIText = `挑戦者：${name} \n 特徴・武器: ${prompt}`;
+    const temp = await this.prompt.tutorialBattlesPropmpt(inputAOAIText);
+    try {
+      const result = await this.prompt.jsonFormatConverter(temp);
+      this.log.recordLog({
+        uid: '',
+        userID: uid,
+        prompt: inputAOAIText,
+        responseMessage: temp,
+        hasError: false,
+      });
+      return result;
+    } catch (e) {
+      console.log(e);
+      this.log.recordLog({
+        uid: '',
+        userID: uid,
+        prompt: inputAOAIText,
+        responseMessage: temp,
+        hasError: true,
+      });
       return {
-        uid: snapshot.id,
-        userID: snapshot.get('userID'),
-        text: snapshot.get('text'),
-        done: snapshot.get('done'),
-        timestamp: snapshot.get('timestamp'),
+        winner: 'user',
+        combatLogs: [
+          {
+            round: 1,
+            combatLog: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
+          },
+          {
+            round: 2,
+            combatLog:
+              '弊社の開発者が敗北しました。もし、デバックしてくれたのであれば会場にいるスタッフにこっそり教えてください。',
+          },
+        ],
       };
-    },
-    toFirestore(todo: todoType): DocumentData {
-      return {
-        userID: todo.userID,
-        text: todo.text,
-        done: todo.done,
-        timestamp: todo.timestamp,
-      };
-    },
-  };
-
-  createTodo = async (todo: Omit<todoType, 'uid' | 'timestamp'>): Promise<void> => {
-    const collRef = this.todoDB.withConverter(this.todoConverter);
-    await collRef.add({ uid: '', ...todo, timestamp: FieldValue.serverTimestamp() });
-  };
-
-  readTodo = async (): Promise<todoType[]> => {
-    const collRef = this.todoDB.withConverter(this.todoConverter);
-    const snapshot = await collRef.get();
-    const result = snapshot.docs.map((doc) => doc.data());
-    return result;
-  };
-
-  updateTodo = async (todo: todoType): Promise<void> => {
-    const collRef = this.todoDB;
-    const docRef = collRef.doc(todo.uid).withConverter(this.todoConverter);
-    await docRef.update({ ...todo });
-  };
-
-  deleteTodo = async (uid: string): Promise<void> => {
-    const collRef = this.todoDB;
-    const docRef = collRef.doc(uid);
-    await docRef.delete();
-  };
+    }
+  }
+  async updateBattleResult(uid: string, winner: 'system' | 'user') {
+    const user = await this.userStore.getUser(uid);
+    if (winner === 'system') {
+      user.winCount++;
+      user.hotStreak++;
+    } else {
+      user.lossCount++;
+      user.hotStreak = 0;
+    }
+    return this.userStore.updateUser(uid, user);
+  }
 }

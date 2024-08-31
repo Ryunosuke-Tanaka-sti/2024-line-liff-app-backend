@@ -19,3 +19,13 @@ export class RequestLineTodoPostDto {
   @IsString()
   text: string;
 }
+
+export class RequestUserIDDto {
+  userID: string;
+}
+
+export class RequestBattleDto {
+  userID: string;
+  name: string;
+  prompt: string;
+}

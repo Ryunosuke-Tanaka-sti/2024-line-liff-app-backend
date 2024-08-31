@@ -1,5 +1,5 @@
 import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { GoogleIdTokenVerifyGuard } from 'src/common/guard/google-id-token-verify/google-id-token-verify.guard';
+import { GoogleIdTokenVerifyGuard } from 'src/misc/guard/google-id-token-verify/google-id-token-verify.guard';
 import { UtilityFilter } from './dto/requeat.dto';
 import { ResponseUserManagerDto, ResponseUserQualificationDto, ResponseUserSkillDto } from './dto/response.dto';
 import { SearchService } from './search.service';

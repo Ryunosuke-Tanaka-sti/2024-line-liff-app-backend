@@ -7,3 +7,15 @@ export class ResponseLineTodoGetDto {
   @Type(() => todoType)
   todos: todoType[];
 }
+
+export class ResponseReadUser {
+  winCount: number;
+  lossCount: number;
+  hotStreak: number;
+}
+
+export class ResposeseOnlyEnemy {
+  enemyID: string;
+  name: string;
+  imageUrl: string;
+}

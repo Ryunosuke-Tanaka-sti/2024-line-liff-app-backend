@@ -4,8 +4,7 @@ name: Development CI
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
-    # branches: ["main"]
-    branches-ignore: ["**"]
+    branches: ["main"]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -14,15 +13,6 @@ env:
 jobs:
   build-app:
     runs-on: ubuntu-latest
-
-    environment: "production"
-    env:
-      CHANNEL_ID: ""
-      BOT_CHANNEL_ACCESS_TOKEN: ""
-      BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
-      FIREBASE_PROJECT_ID: ${{secrets.FIREBASE_PROJECT_ID}}
-      FIREBASE_PRIVATE_KEY: ${{secrets.FIREBASE_PRIVATE_KEY}}
-      FIREBASE_CLIENT_EMAIL: ${{secrets.FIREBASE_CLIENT_EMAIL}}
 
     steps:
       - name: Checkout repository
@@ -38,17 +28,6 @@ jobs:
         run: npm install
         working-directory: backend
 
-      - name: Create env file
-        run: |
-          touch .env
-          echo "CHANNEL_ID=${{env.CHANNEL_ID}}" >> .env
-          echo "BOT_CHANNEL_ACCESS_TOKEN=${{env.BOT_CHANNEL_ACCESS_TOKEN}}" >> .env
-          echo "BOT_CHANNEL_SECRET=${{env.BOT_CHANNEL_SECRET}}" >> .env
-          echo "FIREBASE_PROJECT_ID=${{env.FIREBASE_PROJECT_ID}}" >> .env
-          echo "FIREBASE_PRIVATE_KEY=${{env.FIREBASE_PRIVATE_KEY}}" >> .env
-          echo "FIREBASE_CLIENT_EMAIL=${{env.FIREBASE_CLIENT_EMAIL}}" >> .env
-          mv .env backend/.env
-
       - name: npm build
         run: npm run build
         working-directory: backend
@@ -63,13 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: "build-app"
     environment: "production"
-    env:
-      CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-      BOT_CHANNEL_ACCESS_TOKEN: ${{secrets.BOT_CHANNEL_ACCESS_TOKEN}}
-      BOT_CHANNEL_SECRET: ${{secrets.BOT_CHANNEL_SECRET}}
-      FIREBASE_PROJECT_ID: ${{secrets.FIREBASE_PROJECT_ID}}
-      FIREBASE_PRIVATE_KEY: ${{secrets.FIREBASE_PRIVATE_KEY}}
-      FIREBASE_CLIENT_EMAIL: ${{secrets.FIREBASE_CLIENT_EMAIL}}
 
     outputs:
       image-name: ${{steps.build-name.outputs.container}}
@@ -83,17 +55,6 @@ jobs:
         with:
           path: backend/dist/
           key: ${{ runner.os }}-app-${{ github.sha }}
-
-      - name: Create env file
-        run: |
-          touch .env
-          echo "CHANNEL_ID=${{env.CHANNEL_ID}}" >> .env
-          echo "BOT_CHANNEL_ACCESS_TOKEN=${{env.BOT_CHANNEL_ACCESS_TOKEN}}" >> .env
-          echo "BOT_CHANNEL_SECRET=${{env.BOT_CHANNEL_SECRET}}" >> .env
-          echo "FIREBASE_PROJECT_ID=${{env.FIREBASE_PROJECT_ID}}" >> .env
-          echo "FIREBASE_PRIVATE_KEY=${{env.FIREBASE_PRIVATE_KEY}}" >> .env
-          echo "FIREBASE_CLIENT_EMAIL=${{env.FIREBASE_CLIENT_EMAIL}}" >> .env
-          mv .env backend/.env
 
       - uses: actions/setup-node@v4
         with:

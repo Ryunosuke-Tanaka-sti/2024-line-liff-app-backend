@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UtilitieDataModule } from 'src/utilitie-data/utilitie-data.module';
+import { UtilitieDataModule } from 'src/misc/feature/utilitie-data/utilitie-data.module';
 import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
 

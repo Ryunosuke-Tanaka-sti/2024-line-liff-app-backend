@@ -1,5 +1,5 @@
 import { Body, Controller, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { GoogleIdTokenVerifyGrantIdGuard } from 'src/common/guard/google-id-token-verify-grant-id/google-id-token-verify-grant-id.guard';
+import { GoogleIdTokenVerifyGrantIdGuard } from 'src/misc/guard/google-id-token-verify-grant-id/google-id-token-verify-grant-id.guard';
 import {
   RequestCreateDto,
   RequestUpdateDto,
