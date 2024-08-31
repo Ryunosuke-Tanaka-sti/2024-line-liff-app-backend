@@ -103,6 +103,6 @@ jobs:
     steps:
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: "line-liff-backend"
+          app-name: "gcon-demo"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: "${{needs.build-and-push-image.outputs.image-name}}"
