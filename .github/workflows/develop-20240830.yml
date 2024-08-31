@@ -86,6 +86,7 @@ jobs:
           context: .
           file: ./Dockerfile
           target: production
+          build-args: NODE_VER=20.17.0
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
