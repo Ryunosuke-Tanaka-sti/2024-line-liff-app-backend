@@ -39,9 +39,11 @@ export class LineService {
     return enemy;
   }
 
-  async battlePrompt(uid: string, name: string, prompt: string): Promise<PromptResultType> {
+  async battlePrompt(uid: string, enemyID: string, name: string, prompt: string): Promise<PromptResultType> {
+    const { prompt: enemyPrompt } = await this.enemyStore.getEnemy(enemyID);
+    console.log('enemyPrompt', enemyPrompt);
     const inputAOAIText = `挑戦者：${name} \n 特徴・武器: ${prompt}`;
-    const temp = await this.prompt.tutorialBattlesPropmpt(inputAOAIText);
+    const temp = await this.prompt.battlePrompot(inputAOAIText, enemyPrompt);
     try {
       const result = await this.prompt.jsonFormatConverter(temp);
       this.log.recordLog({
@@ -80,11 +82,11 @@ export class LineService {
   async updateBattleResult(uid: string, winner: 'system' | 'user') {
     const user = await this.userStore.getUser(uid);
     if (winner === 'system') {
-      user.winCount++;
-      user.hotStreak++;
-    } else {
       user.lossCount++;
       user.hotStreak = 0;
+    } else {
+      user.winCount++;
+      user.hotStreak++;
     }
     return this.userStore.updateUser(uid, user);
   }
