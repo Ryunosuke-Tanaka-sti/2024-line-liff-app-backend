@@ -15,43 +15,19 @@ export class LineBotService {
   async replayAOAI(userID: string, replyToken: string, textEventMessage: TextEventMessage): Promise<void> {
     const client = this.env.createLinebotClient();
     const temp = await this.prompt.tutorialBattlesPropmpt(textEventMessage.text);
-    console.log(temp);
 
-    try {
-      console.log('-----------------------------');
-      const result = await this.prompt.jsonFormatConverter(temp);
-      console.log(result);
+    client.replyMessage({
+      replyToken: replyToken,
+      messages: [{ type: 'text', text: temp }],
+    });
 
-      client.replyMessage({
-        replyToken: replyToken,
-        messages: [{ type: 'text', text: temp }],
-      });
-
-      this.log.recordLog({
-        uid: '',
-        userID: userID,
-        prompt: textEventMessage.text,
-        responseMessage: temp,
-        hasError: false,
-      });
-    } catch (e) {
-      console.log(e);
-
-      client.replyMessage({
-        replyToken: replyToken,
-        messages: [
-          { type: 'text', text: '戦士の登録がうまくされていない可能性があります。' },
-          { type: 'text', text: temp },
-        ],
-      });
-      this.log.recordLog({
-        uid: '',
-        userID: userID,
-        prompt: textEventMessage.text,
-        responseMessage: temp,
-        hasError: true,
-      });
-    }
+    this.log.recordLog({
+      uid: '',
+      userID: userID,
+      prompt: textEventMessage.text,
+      responseMessage: temp,
+      hasError: false,
+    });
 
     return;
   }

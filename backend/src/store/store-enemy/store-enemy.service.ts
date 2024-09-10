@@ -43,4 +43,8 @@ export class StoreEnemyService {
     const enemyList = await this.enemyDB.withConverter(this.enemyConverter).get();
     return enemyList.docs.map((doc) => doc.data());
   }
+  async createEnemy(enemy: EnemyType) {
+    const enemyRef = await this.enemyDB.withConverter(this.enemyConverter).add(enemy);
+    return enemyRef.id;
+  }
 }

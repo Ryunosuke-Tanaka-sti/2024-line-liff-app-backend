@@ -90,4 +90,17 @@ export class LineService {
     }
     return this.userStore.updateUser(uid, user);
   }
+
+  async createEnemy(name: string, prompt: string, originalContentUrl: string, previewImageUrl: string) {
+    const enemy = {
+      uid: 'creteするぞ',
+      name: name,
+      prompt: prompt,
+      originalContentUrl: originalContentUrl,
+      previewImageUrl: previewImageUrl,
+    };
+    console.log('enemy', enemy);
+    await this.enemyStore.createEnemy(enemy);
+    return;
+  }
 }

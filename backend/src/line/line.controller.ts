@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import { IsLiffAuthenticatedGuard } from 'src/common/guard/is-liff-authenticated/is-liff-authenticated.guard';
-import { RequestBattleDto, RequestUserIDDto } from './dto/request-line.dto';
+import { RequestBattleDto, RequestCreateEnemyDto, RequestUserIDDto } from './dto/request-line.dto';
 import { ResponseReadUser, ResposeseOnlyEnemy } from './dto/response-line.dto';
 import { LineService } from './line.service';
 
@@ -43,5 +43,11 @@ export class LineController {
     const winner = result.winner;
     await this.lineService.updateBattleResult(req.userID, winner);
     return result;
+  }
+
+  @Post('enemy')
+  async createEnemy(@Body() req: RequestCreateEnemyDto): Promise<void> {
+    const { name, prompt, originalContentUrl, previewImageUrl } = req;
+    await this.lineService.createEnemy(name, prompt, originalContentUrl, previewImageUrl);
   }
 }

@@ -8,3 +8,10 @@ export class RequestBattleDto {
   name: string;
   prompt: string;
 }
+
+export class RequestCreateEnemyDto {
+  name: string;
+  prompt: string;
+  originalContentUrl: string;
+  previewImageUrl: string;
+}
