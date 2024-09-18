@@ -67,8 +67,6 @@ export class AoaiPromptService {
       - 足を負傷しているが歴戦の猛者である
       - 訓練場の教官であるため決闘の際は力を制限している
       ---
-      
-      ---
     `;
     const result = await AOAIClient.chat.completions.create({
       messages: [
