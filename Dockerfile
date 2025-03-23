@@ -20,7 +20,7 @@ RUN npm install
 
 COPY --chown=node:node ./backend ./
 
-CMD [ "npm", "run", "start:dev" ]
+RUN npm install
 
 
 FROM node:${NODE_VER} as builder

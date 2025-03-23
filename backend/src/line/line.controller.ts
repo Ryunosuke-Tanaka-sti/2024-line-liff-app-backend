@@ -25,6 +25,12 @@ export class LineController {
     return readUser;
   }
 
+  @Get("test")
+   async test(){
+    const result = await this.lineService.battlePromptTest();
+    return result;
+  }
+
   @Get('battle')
   @UseGuards(IsLiffAuthenticatedGuard)
   async battlePrompt(): Promise<ResposeseOnlyEnemy> {
@@ -35,6 +41,7 @@ export class LineController {
       imageUrl: enemy.originalContentUrl,
     };
   }
+
 
   @Post('battle')
   @UseGuards(IsLiffAuthenticatedGuard)

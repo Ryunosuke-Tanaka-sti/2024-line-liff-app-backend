@@ -79,6 +79,12 @@ export class LineService {
       };
     }
   }
+  async battlePromptTest():Promise<PromptResultType>{
+    const temp = await this.prompt.battlePrompotFormatJSON()
+    return temp
+
+  }
+
   async updateBattleResult(uid: string, winner: 'system' | 'user') {
     const user = await this.userStore.getUser(uid);
     if (winner === 'system') {

@@ -29,5 +29,6 @@
     }
   },
   "forwardPorts": [3000],
-  "remoteUser": "node"
+  "remoteUser": "node",
+  "initializeCommand": "docker network inspect line-liff || docker network create line-liff"
 }

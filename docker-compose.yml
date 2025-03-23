@@ -17,6 +17,11 @@ services:
         target: /home/node/app/node_modules
     ports:
       - "3000:3000"
+    networks:
+      - line-liff
 
+networks:
+  line-liff:
+    external: true
 volumes:
   node_modules:

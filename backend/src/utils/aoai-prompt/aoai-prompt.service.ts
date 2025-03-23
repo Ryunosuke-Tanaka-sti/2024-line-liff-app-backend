@@ -50,7 +50,85 @@ export class AoaiPromptService {
       ],
       model: '',
     });
+
     const choice = result.choices[0].message.content || 'AOAIの返答がありません';
+    return choice;
+  }
+  async battlePrompotFormatJSON(): Promise<PromptResultType> {
+    const AOAIClient = this.env.AOAIClientGPT4o();
+
+    const systemPrompt = `
+      あなたは決闘の審判です。二つのキャラクターの戦闘を見守り、勝敗までの流れを判定してください。
+      AI側がチャンピオン、ユーザー側が挑戦者です。
+      次の内容は必ず守ってください「チャンピオンのキャラクターが勝利した場合はsystem、挑戦者が勝利した場合はuserと明記してください。」
+      ---
+      ボクシングチャンピオン主にこぶしで戦う
+      ---
+      以下のType出力を守った内容を最後に付録として記載してください。
+      ---
+      {
+        "combatLogs": {
+          "round":number,
+          "combatLog":string
+        }[]
+      }
+      ---
+      例は以下のようになります。combatLogは小説家のように過大に脚色して演出してください。決闘の勝者を明確にしてください。
+      ---
+      {
+        "combatLogs": [
+          {
+            "round": 1,
+            "combatLog": "訓練場の教官が鉄の剣で攻撃しました"
+          },
+          {
+            "round": 2,
+            "combatLog": "訓練場の教官が鉄の盾で防御しました"
+          }
+        ]
+      }
+      ---
+    `;
+    const result = await AOAIClient.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        { role: 'user', content: '剣士 主に剣で戦う' },
+      ],
+      model: '',
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'combat_schema',
+          schema: {
+            type: 'object',
+            properties: {
+              winer: {
+                description:
+                  '戦いの勝者を記述する。ユーザー側が勝利した場合は「user」、システム側が勝利した場合は「sysytem」を代入',
+                type: 'string',
+              },
+              combatLogs: {
+                description: '戦いの記録を記述する。roundには記録の順序を記述する。combatLogには記録の内容を記述する。',
+                type: 'array',
+                items: {
+                  type: 'object',
+                  required: ['round', 'combatLog'],
+                  properties: {
+                    round: { type: 'number' },
+                    combatLog: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    console.log(result.choices[0].message.content);
+    const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
     return choice;
   }
 
