@@ -63,7 +63,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: npm install production
-        run: npm install --production
+        run: npm install --omit=dev
         working-directory: backend
 
       - name: Log in to the Container registry
