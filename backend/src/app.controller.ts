@@ -13,7 +13,7 @@ export class AppController {
 
   @Post('/api')
   async postHello(@Body() req): Promise<{ roles: string[] }> {
-    console.log(`request`, req);
+    console.error(`request`, req);
     return { roles: ['admin'] };
   }
 }

@@ -1,8 +1,6 @@
 {
   "name": "procject-dev",
-  "dockerComposeFile": [
-    "../compose.yml"
-  ],
+  "dockerComposeFile": ["../compose.yml"],
   "service": "nest",
   "workspaceFolder": "/home/node/app",
   "customizations": {
@@ -18,7 +16,8 @@
         "formulahendry.auto-rename-tag",
         "vscode-icons-team.vscode-icons",
         "MariusAlchimavicius.json-to-ts",
-        "wix.vscode-import-cost"
+        "wix.vscode-import-cost",
+        "github.vscode-github-actions"
       ],
       "settings": {
         "files.encoding": "utf8",
@@ -30,9 +29,7 @@
       }
     }
   },
-  "forwardPorts": [
-    3000
-  ],
+  "forwardPorts": [3000],
   "remoteUser": "node",
   "initializeCommand": "docker network inspect line-liff || docker network create line-liff"
 }
