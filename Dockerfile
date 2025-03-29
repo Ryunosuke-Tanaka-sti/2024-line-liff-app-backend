@@ -13,6 +13,11 @@ WORKDIR /home/node/app
 RUN chown -R node:node .
 
 USER node
+
+RUN mkdir backend
+RUN chown -R node:node ./backend
+WORKDIR /home/node/app/backend
+
 RUN mkdir node_modules
 
 COPY --chown=node:node ./backend/package.json ./backend/package-lock.json ./

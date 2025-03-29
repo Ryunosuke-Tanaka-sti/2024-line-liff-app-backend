@@ -1,6 +1,8 @@
 {
   "name": "procject-dev",
-  "dockerComposeFile": ["../docker-compose.yml"],
+  "dockerComposeFile": [
+    "../compose.yml"
+  ],
   "service": "nest",
   "workspaceFolder": "/home/node/app",
   "customizations": {
@@ -28,7 +30,9 @@
       }
     }
   },
-  "forwardPorts": [3000],
+  "forwardPorts": [
+    3000
+  ],
   "remoteUser": "node",
   "initializeCommand": "docker network inspect line-liff || docker network create line-liff"
 }

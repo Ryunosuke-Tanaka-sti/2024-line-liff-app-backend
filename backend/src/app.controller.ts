@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -11,9 +11,9 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('/api')
-  async postHello(): Promise<{ roles: string[] }> {
-    console.log(`request`);
+  @Post('/api')
+  async postHello(@Body() req): Promise<{ roles: string[] }> {
+    console.log(`request`, req);
     return { roles: ['admin'] };
   }
 }
