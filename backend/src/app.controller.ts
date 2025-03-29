@@ -6,14 +6,18 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/')
-  async getHello(@Body() request: { uid: string }): Promise<string> {
-    console.log(`request ${request.uid}`);
-    return this.appService.getHello();
+  async getHello(): Promise<string> {
+    console.log(`request`);
+    return 'come on';
+    // return this.appService.getHello();
   }
 
   @Post('/api')
-  async postHello(@Body() req): Promise<{ roles: string[] }> {
+  async postHello(@Body() req: { userDetails: string }): Promise<{ roles: string[] }> {
     console.error(`request`, req);
-    return { roles: ['admin'] };
+    if (req.userDetails === 'ry-tanaka@sios.com') {
+      return { roles: ['admin', 'user'] };
+    }
+    return { roles: [] };
   }
 }
