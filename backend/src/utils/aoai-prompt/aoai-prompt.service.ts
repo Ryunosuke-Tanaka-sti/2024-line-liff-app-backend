@@ -54,6 +54,7 @@ export class AoaiPromptService {
     const choice = result.choices[0].message.content || 'AOAIの返答がありません';
     return choice;
   }
+  // TEST:JSON作成モードの挙動確認用
   async battlePrompotFormatJSON(): Promise<PromptResultType> {
     const AOAIClient = this.env.AOAIClientGPT4o();
 

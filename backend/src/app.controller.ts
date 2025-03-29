@@ -12,8 +12,8 @@ export class AppController {
   }
 
   @Get('/api')
-  async postHello(@Body() request: { uid: string }): Promise<string> {
-    console.log(`request ${request.uid}`);
-    return this.appService.getHello();
+  async postHello(): Promise<{ roles: string[] }> {
+    console.log(`request`);
+    return { roles: ['admin'] };
   }
 }
