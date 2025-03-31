@@ -189,6 +189,7 @@ export class AoaiPromptService {
       response_format: response_format,
     });
     const math_combat_schema = result.choices[0].message;
+    console.log(math_combat_schema);
     if (math_combat_schema.refusal) {
       return {
         winner: 'user',
