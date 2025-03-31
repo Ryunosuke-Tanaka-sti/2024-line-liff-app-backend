@@ -43,14 +43,13 @@ export class LineService {
     const { prompt: enemyPrompt } = await this.enemyStore.getEnemy(enemyID);
     console.log('enemyPrompt', enemyPrompt);
     const inputAOAIText = `挑戦者：${name} \n 特徴・武器: ${prompt}`;
-    const temp = await this.prompt.battlePrompot(inputAOAIText, enemyPrompt);
     try {
-      const result = await this.prompt.jsonFormatConverter(temp);
+      const result = await this.prompt.battlePrompot(inputAOAIText, enemyPrompt);
       this.log.recordLog({
         uid: '',
         userID: uid,
         prompt: inputAOAIText,
-        responseMessage: temp,
+        responseMessage: JSON.stringify(result),
         hasError: false,
       });
       return result;
@@ -60,7 +59,7 @@ export class LineService {
         uid: '',
         userID: uid,
         prompt: inputAOAIText,
-        responseMessage: temp,
+        responseMessage: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
         hasError: true,
       });
       return {
@@ -72,17 +71,16 @@ export class LineService {
           },
           {
             round: 2,
-            combatLog:
-              '弊社の開発者が敗北しました。もし、デバックしてくれたのであれば会場にいるスタッフにこっそり教えてください。',
+            combatLog: '弊社の開発者が敗北しました。もし、デバックしてくれたのであればXでお知らせしてください。',
           },
         ],
       };
     }
   }
-  async battlePromptTest():Promise<PromptResultType>{
-    const temp = await this.prompt.battlePrompotFormatJSON()
-    return temp
-
+  async battlePromptTest(): Promise<PromptResultType> {
+    // const temp = await this.prompt.battlePrompotFormatJSON_JsonSchema();
+    const temp = await this.prompt.battlePrompotFormatJSON_Zod();
+    return temp;
   }
 
   async updateBattleResult(uid: string, winner: 'system' | 'user') {

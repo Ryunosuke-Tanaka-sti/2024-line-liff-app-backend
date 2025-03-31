@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { EnvironmentsService } from 'src/config/enviroments.service';
-import { PromptResultType } from 'src/types/promptType';
+import { PromptResultType, PromptResultTypeSchema } from 'src/types/promptType';
+import { zodResponseFormat } from 'openai/helpers/zod';
 
 @Injectable()
 export class AoaiPromptService {
   constructor(private readonly env: EnvironmentsService) {}
 
-  async battlePrompot(characterPrompt: string, enemyPrompt: string): Promise<string> {
+  async battlePrompot(characterPrompt: string, enemyPrompt: string): Promise<PromptResultType> {
     const AOAIClient = this.env.AOAIClientGPT4o();
     const systemPrompt = `
       あなたは決闘の審判です。二つのキャラクターの戦闘を見守り、勝敗までの流れを判定してください。
@@ -40,6 +41,8 @@ export class AoaiPromptService {
       }
       ---
     `;
+    const response_format = zodResponseFormat(PromptResultTypeSchema, 'combat_schema');
+
     const result = await AOAIClient.chat.completions.create({
       messages: [
         {
@@ -49,13 +52,18 @@ export class AoaiPromptService {
         { role: 'user', content: characterPrompt },
       ],
       model: '',
+      response_format: response_format,
     });
-
-    const choice = result.choices[0].message.content || 'AOAIの返答がありません';
+    const math_combat_schema = result.choices[0].message;
+    if (math_combat_schema.refusal) {
+      throw new Error('JSON整形を正しく行うことができませんでした。よって開発者の負けです。');
+    }
+    const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
+    console.log(choice);
     return choice;
   }
   // TEST:JSON作成モードの挙動確認用
-  async battlePrompotFormatJSON(): Promise<PromptResultType> {
+  async battlePrompotFormatJSON_JsonSchema(): Promise<PromptResultType> {
     const AOAIClient = this.env.AOAIClientGPT4o();
 
     const systemPrompt = `
@@ -130,6 +138,75 @@ export class AoaiPromptService {
     });
     console.log(result.choices[0].message.content);
     const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
+    return choice;
+  }
+
+  async battlePrompotFormatJSON_Zod(): Promise<PromptResultType> {
+    const AOAIClient = this.env.AOAIClientGPT4o();
+
+    const systemPrompt = `
+      あなたは決闘の審判です。二つのキャラクターの戦闘を見守り、勝敗までの流れを判定してください。
+      AI側がチャンピオン、ユーザー側が挑戦者です。
+      次の内容は必ず守ってください「チャンピオンのキャラクターが勝利した場合はsystem、挑戦者が勝利した場合はuserと明記してください。」
+      ---
+      ボクシングチャンピオン主にこぶしで戦う
+      ---
+      以下のType出力を守った内容を最後に付録として記載してください。
+      ---
+      {
+        "combatLogs": {
+          "round":number,
+          "combatLog":string
+        }[]
+      }
+      ---
+      例は以下のようになります。combatLogは小説家のように過大に脚色して演出してください。決闘の勝者を明確にしてください。
+      ---
+      {
+        "combatLogs": [
+          {
+            "round": 1,
+            "combatLog": "訓練場の教官が鉄の剣で攻撃しました"
+            },
+          {
+            "round": 2,
+            "combatLog": "訓練場の教官が鉄の盾で防御しました"
+            }
+            ]
+            }
+            ---
+            `;
+    const response_format = zodResponseFormat(PromptResultTypeSchema, 'combat_schema');
+    const result = await AOAIClient.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        { role: 'user', content: '剣士 主に剣で戦う' },
+      ],
+      model: '',
+      response_format: response_format,
+    });
+    const math_combat_schema = result.choices[0].message;
+    if (math_combat_schema.refusal) {
+      return {
+        winner: 'user',
+        combatLogs: [
+          {
+            round: 1,
+            combatLog: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
+          },
+          {
+            round: 2,
+            combatLog:
+              '弊社の開発者が敗北しました。もし、デバックしてくれたのであれば会場にいるスタッフにこっそり教えてください。',
+          },
+        ],
+      };
+    }
+    const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
+    console.log(choice);
     return choice;
   }
 
