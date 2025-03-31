@@ -11,6 +11,11 @@ import { AzureOpenAI } from 'openai';
 export class EnvironmentsService {
   constructor(private configService: ConfigService) {}
 
+  get AdminEmailList(): string[] {
+    const adminEmailList: string = this.configService.get('ADMIN_EMAIL_LIST');
+    return adminEmailList.split(',');
+  }
+
   get LiffID(): string[] {
     return this.configService.get('LIFF_ID');
   }

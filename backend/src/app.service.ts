@@ -23,4 +23,13 @@ export class AppService {
 
     return `Hello World!!!!!!`;
   }
+
+  async assignRoles(email: string): Promise<string[]> {
+    const adminList = this.env.AdminEmailList;
+    const isAdmin = adminList.includes(email);
+    if (isAdmin) {
+      return ['admin', 'user'];
+    }
+    return ['user'];
+  }
 }

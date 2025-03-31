@@ -5,19 +5,16 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/api')
+  @Get('/api/assignRoles')
   async getHello(): Promise<string> {
     console.log(`request`);
     return 'come on';
     // return this.appService.getHello();
   }
 
-  @Post('/api')
+  @Post('/api/assignRoles')
   async postHello(@Body() req: { userDetails: string }): Promise<{ roles: string[] }> {
-    console.error(`request`, req);
-    if (req.userDetails === 'ry-tanaka@sios.com') {
-      return { roles: ['admin', 'user'] };
-    }
-    return { roles: [] };
+    const roles = await this.appService.assignRoles(req.userDetails);
+    return { roles: roles };
   }
 }
