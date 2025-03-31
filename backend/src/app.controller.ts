@@ -6,7 +6,7 @@ import { IsGoogleAuthenticatedGuard } from './common/guard/is-google-authenticat
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/api/assignRoles')
+  @Get('/api/auth')
   @UseGuards(IsGoogleAuthenticatedGuard)
   async getHello(
     @Body() req: { googleAccessToken: string; googleRefreshToken: string },
