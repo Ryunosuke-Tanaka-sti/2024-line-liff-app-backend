@@ -5,7 +5,7 @@ import { RequestBattleDto, RequestCreateEnemyDto, RequestUserIDDto } from './dto
 import { ResponseReadUser, ResposeseOnlyEnemy } from './dto/response-line.dto';
 import { LineService } from './line.service';
 
-@Controller('api')
+@Controller('/api/prompt-battle/')
 export class LineController {
   constructor(private readonly lineService: LineService) {}
 
@@ -25,8 +25,8 @@ export class LineController {
     return readUser;
   }
 
-  @Get("test")
-   async test(){
+  @Get('test')
+  async test() {
     const result = await this.lineService.battlePromptTest();
     return result;
   }
@@ -41,7 +41,6 @@ export class LineController {
       imageUrl: enemy.originalContentUrl,
     };
   }
-
 
   @Post('battle')
   @UseGuards(IsLiffAuthenticatedGuard)
