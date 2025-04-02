@@ -9,6 +9,7 @@ import { StoreEnemyModule } from './store/store-enemy/store-enemy.module';
 import { StoreUserModule } from './store/store-user/store-user.module';
 import { AoaiPromptModule } from './utils/aoai-prompt/aoai-prompt.module';
 import { TokenDecodeModule } from './utils/token-decode/token-decode.module';
+import { GoogleAuthModule } from './google-auth/google-auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TokenDecodeModule } from './utils/token-decode/token-decode.module';
     LogModule,
     StoreUserModule,
     StoreEnemyModule,
+    GoogleAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

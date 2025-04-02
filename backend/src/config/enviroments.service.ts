@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { credential } from 'firebase-admin';
 import { App, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { OAuth2Client } from 'google-auth-library';
 import { AzureOpenAI } from 'openai';
 
 @Injectable()
@@ -97,6 +98,25 @@ export class EnvironmentsService {
       apiKey: this.AOAIKey,
       apiVersion: this.AOAIApiVersion,
       deployment: this.AOAIDeploymentsID2,
+    });
+    return client;
+  }
+
+  get GoogleClientID(): string {
+    return this.configService.get('GOOGLE_CLIENT_ID');
+  }
+  get GoogleClientSecret(): string {
+    return this.configService.get('GOOGLE_CLIENT_SECRET');
+  }
+  get GoogleRedirectUri(): string {
+    return this.configService.get('GOOGLE_CALLBACK_URL');
+  }
+
+  GoogleOAuth2Client() {
+    const client = new OAuth2Client({
+      clientId: this.GoogleClientID,
+      clientSecret: this.GoogleClientSecret,
+      redirectUri: this.GoogleRedirectUri,
     });
     return client;
   }
