@@ -39,7 +39,7 @@ export class LineService {
     return enemy;
   }
 
-  async battlePrompt(uid: string, enemyID: string, name: string, prompt: string): Promise<PromptResultType> {
+  async battlePrompt(enemyID: string, name: string, prompt: string): Promise<PromptResultType> {
     const { prompt: enemyPrompt } = await this.enemyStore.getEnemy(enemyID);
     console.log('enemyPrompt', enemyPrompt);
     const inputAOAIText = `挑戦者：${name} \n 特徴・武器: ${prompt}`;
@@ -47,7 +47,7 @@ export class LineService {
       const result = await this.prompt.battlePrompot(inputAOAIText, enemyPrompt);
       this.log.recordLog({
         uid: '',
-        userID: uid,
+        userID: '',
         prompt: inputAOAIText,
         responseMessage: JSON.stringify(result),
         hasError: false,
@@ -57,7 +57,7 @@ export class LineService {
       console.log(e);
       this.log.recordLog({
         uid: '',
-        userID: uid,
+        userID: '',
         prompt: inputAOAIText,
         responseMessage: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
         hasError: true,

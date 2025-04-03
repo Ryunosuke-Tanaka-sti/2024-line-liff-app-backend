@@ -54,9 +54,9 @@ export class LineController {
   @Post('battle')
   @UseGuards(IsLiffAuthenticatedGuard)
   async battle(@Body() req: RequestBattleDto) {
-    const result = await this.lineService.battlePrompt(req.userID, req.enemyID, req.name, req.prompt);
-    const winner = result.winner;
-    await this.lineService.updateBattleResult(req.userID, winner);
+    const result = await this.lineService.battlePrompt(req.enemyID, req.name, req.prompt);
+    // const winner = result.winner;
+    // await this.lineService.updateBattleResult(req.userID, winner);
     return result;
   }
 

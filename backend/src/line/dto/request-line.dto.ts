@@ -3,7 +3,6 @@ export class RequestUserIDDto {
 }
 
 export class RequestBattleDto {
-  userID: string;
   enemyID: string;
   name: string;
   prompt: string;
