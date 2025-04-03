@@ -41,6 +41,15 @@ export class LineController {
       imageUrl: enemy.originalContentUrl,
     };
   }
+  @Get('battle-test')
+  async battlePromptTest(): Promise<ResposeseOnlyEnemy> {
+    const enemy = await this.lineService.getRandamEnemy();
+    return {
+      enemyID: enemy.uid,
+      name: enemy.name,
+      imageUrl: enemy.originalContentUrl,
+    };
+  }
 
   @Post('battle')
   @UseGuards(IsLiffAuthenticatedGuard)
