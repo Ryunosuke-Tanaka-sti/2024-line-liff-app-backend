@@ -5,7 +5,7 @@ import { RequestBattleDto, RequestCreateEnemyDto, RequestUserIDDto } from './dto
 import { ResponseReadUser, ResposeseOnlyEnemy } from './dto/response-line.dto';
 import { LineService } from './line.service';
 
-@Controller('/api/prompt-battle/')
+@Controller('/api/line/')
 export class LineController {
   constructor(private readonly lineService: LineService) {}
 
