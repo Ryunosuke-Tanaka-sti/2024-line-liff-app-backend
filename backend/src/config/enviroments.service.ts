@@ -120,4 +120,8 @@ export class EnvironmentsService {
     });
     return client;
   }
+
+  get GoogleScriptURL(): string {
+    return this.configService.get('GAS_SCRIPT_URL');
+  }
 }
