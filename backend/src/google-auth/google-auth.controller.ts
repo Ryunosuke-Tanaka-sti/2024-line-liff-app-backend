@@ -1,10 +1,14 @@
 import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { IsGoogleIdTokenVerifyGuard } from 'src/common/guard/is-google-id-token-verify/is-google-id-token-verify.guard';
+import { EnvironmentsService } from 'src/config/enviroments.service';
 import { GoogleAuthService } from './google-auth.service';
 
 @Controller('/api/google-auth/')
 export class GoogleAuthController {
-  constructor(private readonly googleAuthService: GoogleAuthService) {}
+  constructor(
+    private readonly googleAuthService: GoogleAuthService,
+    private readonly env: EnvironmentsService,
+  ) {}
 
   // Google認証のURLを取得する
   @Get()
@@ -19,15 +23,16 @@ export class GoogleAuthController {
     const tokens = await this.googleAuthService.getToken(code);
 
     res.cookie('id_token', tokens.id_token, {
-      httpOnly: false,
-      secure: false,
+      httpOnly: this.env.isProduction,
+      secure: this.env.isProduction,
       sameSite: 'Strict',
       maxAge: 3600 * 1000, // 1時間
     });
 
+    // 環境によってbooleanを切り替える
     res.cookie('access_token', tokens.access_token, {
-      httpOnly: false,
-      secure: false,
+      httpOnly: this.env.isProduction,
+      secure: this.env.isProduction,
       sameSite: 'Strict',
       maxAge: 3600 * 1000, // 1時間
     });

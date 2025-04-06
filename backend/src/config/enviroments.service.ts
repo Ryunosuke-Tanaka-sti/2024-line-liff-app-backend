@@ -124,4 +124,13 @@ export class EnvironmentsService {
   get GoogleScriptURL(): string {
     return this.configService.get('GAS_SCRIPT_URL');
   }
+
+  get isProduction(): boolean {
+    const env: string = this.configService.get('ENV');
+    if (env === 'development') {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
