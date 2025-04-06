@@ -37,7 +37,7 @@ export class GoogleAuthController {
       maxAge: 3600 * 1000, // 1時間
     });
 
-    res.redirect('/comunity/google/');
+    res.redirect('/community/google/');
   }
 
   // Google認証のトークンを検証する
