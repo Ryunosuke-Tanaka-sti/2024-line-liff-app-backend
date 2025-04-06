@@ -1,6 +1,6 @@
-import { Controller, Get, Res, Req, Query, UseGuards } from '@nestjs/common';
-import { GoogleAuthService } from './google-auth.service';
+import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { IsGoogleIdTokenVerifyGuard } from 'src/common/guard/is-google-id-token-verify/is-google-id-token-verify.guard';
+import { GoogleAuthService } from './google-auth.service';
 
 @Controller('/api/google-auth/')
 export class GoogleAuthController {
@@ -32,7 +32,7 @@ export class GoogleAuthController {
       maxAge: 3600 * 1000, // 1時間
     });
 
-    res.redirect('/google');
+    res.redirect('/comunity/google/');
   }
 
   // Google認証のトークンを検証する
