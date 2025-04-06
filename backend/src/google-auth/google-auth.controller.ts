@@ -1,5 +1,6 @@
-import { Controller, Get, Res, Req, Query } from '@nestjs/common';
+import { Controller, Get, Res, Req, Query, UseGuards } from '@nestjs/common';
 import { GoogleAuthService } from './google-auth.service';
+import { IsGoogleIdTokenVerifyGuard } from 'src/common/guard/is-google-id-token-verify/is-google-id-token-verify.guard';
 
 @Controller('/api/google-auth/')
 export class GoogleAuthController {
@@ -38,18 +39,25 @@ export class GoogleAuthController {
   @Get('verify')
   async verifyIdToken(@Req() req, @Res() res): Promise<void> {
     const idToken = req.cookies['id_token'];
-    if (!idToken) res.redirect('/api/google-auth');
 
+    if (!idToken) {
+      const authUrl = await this.googleAuthService.getGoogleAuthUrl();
+      res.status(401).json({ message: 'No id_token', url: authUrl });
+    }
+
+    // token validation
     const isValid = await this.googleAuthService.verfyIdToken(idToken);
 
     if (isValid) {
       res.status(200).json({ message: 'Valid access token' });
     } else {
-      res.redirect('/api/google-auth');
+      const authUrl = await this.googleAuthService.getGoogleAuthUrl();
+      res.status(401).json({ message: 'No id_token', url: authUrl });
     }
   }
 
   @Get('test')
+  @UseGuards(IsGoogleIdTokenVerifyGuard)
   async test(@Req() req, @Res() res): Promise<void> {
     const access_token = req.cookies['access_token'];
     console.log('access_token', access_token);
