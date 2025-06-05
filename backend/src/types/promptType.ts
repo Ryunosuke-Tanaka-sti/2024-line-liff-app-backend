@@ -8,7 +8,7 @@ export class PromptResultType {
   }[];
 }
 
-export const PromptResultTypeSchema = z.object({
+export const PromptResultTypeSchemaZod = z.object({
   winner: z
     .enum(['user', 'system'])
     .describe('戦いの勝者を記述する。ユーザー側が勝利した場合は「user」、システム側が勝利した場合は「sysytem」を代入'),
@@ -19,3 +19,5 @@ export const PromptResultTypeSchema = z.object({
     }),
   ),
 });
+
+export type PromptResultTypeFromZod = z.infer<typeof PromptResultTypeSchemaZod>;

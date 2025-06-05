@@ -4,7 +4,7 @@ import { StoreEnemyService } from 'src/store/store-enemy/store-enemy.service';
 
 import { StoreUserService } from 'src/store/store-user/store-user.service';
 import { EnemyType } from 'src/types/enemyType';
-import { PromptResultType } from 'src/types/promptType';
+import { PromptResultType, PromptResultTypeFromZod } from 'src/types/promptType';
 import { UserType } from 'src/types/userType';
 import { AoaiPromptService } from 'src/utils/aoai-prompt/aoai-prompt.service';
 
@@ -77,7 +77,7 @@ export class LineService {
       };
     }
   }
-  async battlePromptTest(): Promise<PromptResultType> {
+  async battlePromptTest(): Promise<PromptResultTypeFromZod> {
     // const temp = await this.prompt.battlePrompotFormatJSON_JsonSchema();
     const temp = await this.prompt.battlePrompotFormatJSON_Zod();
     return temp;

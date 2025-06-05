@@ -10,10 +10,13 @@ import { StoreUserModule } from './store/store-user/store-user.module';
 import { AoaiPromptModule } from './utils/aoai-prompt/aoai-prompt.module';
 import { TokenDecodeModule } from './utils/token-decode/token-decode.module';
 import { GoogleAuthModule } from './google-auth/google-auth.module';
+import { DocsAccessModule } from './utils/docs-access/docs-access.module';
+import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [
     EnvironmentsModule,
+    DocsAccessModule,
     TokenDecodeModule,
     LineModule,
     LineBotModule,
@@ -22,6 +25,7 @@ import { GoogleAuthModule } from './google-auth/google-auth.module';
     StoreUserModule,
     StoreEnemyModule,
     GoogleAuthModule,
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [AppService],
