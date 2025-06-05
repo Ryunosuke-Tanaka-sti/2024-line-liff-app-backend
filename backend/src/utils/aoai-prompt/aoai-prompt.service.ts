@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { EnvironmentsService } from 'src/config/enviroments.service';
-import { PromptResultType, PromptResultTypeSchema } from 'src/types/promptType';
 import { zodResponseFormat } from 'openai/helpers/zod';
+import { EnvironmentsService } from 'src/config/enviroments.service';
+import { PromptResultType, PromptResultTypeSchemaZod } from 'src/types/promptType';
+
+import { z } from 'zod';
 
 @Injectable()
 export class AoaiPromptService {
@@ -41,7 +43,7 @@ export class AoaiPromptService {
       }
       ---
     `;
-    const response_format = zodResponseFormat(PromptResultTypeSchema, 'combat_schema');
+    const response_format = zodResponseFormat(PromptResultTypeSchemaZod, 'combat_schema');
 
     const result = await AOAIClient.chat.completions.create({
       messages: [
@@ -140,8 +142,7 @@ export class AoaiPromptService {
     const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
     return choice;
   }
-
-  async battlePrompotFormatJSON_Zod(): Promise<PromptResultType> {
+  async battlePrompotFormatJSON_Zod(): Promise<z.infer<typeof PromptResultTypeSchemaZod>> {
     const AOAIClient = this.env.AOAIClientGPT4o();
 
     const systemPrompt = `
@@ -176,8 +177,9 @@ export class AoaiPromptService {
             }
             ---
             `;
-    const response_format = zodResponseFormat(PromptResultTypeSchema, 'combat_schema');
-    const result = await AOAIClient.chat.completions.create({
+    const response_format = zodResponseFormat(PromptResultTypeSchemaZod, 'combat_schema');
+
+    const res = await AOAIClient.chat.completions.create({
       messages: [
         {
           role: 'system',
@@ -188,8 +190,9 @@ export class AoaiPromptService {
       model: '',
       response_format: response_format,
     });
-    const math_combat_schema = result.choices[0].message;
-    console.log(math_combat_schema);
+
+    const math_combat_schema = res.choices[0].message;
+
     if (math_combat_schema.refusal) {
       return {
         winner: 'user',
@@ -198,17 +201,25 @@ export class AoaiPromptService {
             round: 1,
             combatLog: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
           },
+        ],
+      };
+    }
+
+    const tmp = PromptResultTypeSchemaZod.safeParse(JSON.parse(res.choices[0].message.content));
+    if (!tmp.success) {
+      console.log(tmp.error);
+      return {
+        winner: 'user',
+        combatLogs: [
           {
-            round: 2,
-            combatLog:
-              '弊社の開発者が敗北しました。もし、デバックしてくれたのであれば会場にいるスタッフにこっそり教えてください。',
+            round: 1,
+            combatLog: 'JSON整形を正しく行うことができませんでした。よって開発者の負けです。',
           },
         ],
       };
     }
-    const choice: PromptResultType = JSON.parse(result.choices[0].message.content);
-    console.log(choice);
-    return choice;
+
+    return tmp.data;
   }
 
   async tutorialBattlesPropmpt(characterPrompt: string): Promise<string> {

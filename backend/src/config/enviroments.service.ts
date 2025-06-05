@@ -8,6 +8,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { OAuth2Client } from 'google-auth-library';
 import { AzureOpenAI } from 'openai';
 
+import { docs_v1, google } from 'googleapis';
+
 @Injectable()
 export class EnvironmentsService {
   constructor(private configService: ConfigService) {}
@@ -58,6 +60,30 @@ export class EnvironmentsService {
       }),
     });
     return this.firebaseApp;
+  }
+
+  private googleDocs: docs_v1.Docs;
+  get googleDosc() {
+    if (this.googleDocs) return this.googleDocs;
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.DOCS_CLIENT_EMAIL,
+        private_key: process.env.DOCS_PRIVATE_KEY.replace(/\\n/g, '\n'), // 環境変数から読み込む場合は改行コードを修正
+      },
+      scopes: ['https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/drive'], // 必要なスコープ
+    });
+
+    this.googleDocs = google.docs({
+      version: 'v1',
+      auth,
+    });
+
+    return this.googleDocs;
+  }
+
+  get GoogleDocsID(): string {
+    return this.configService.get('DOCS_ID');
   }
 
   get firestoreDB() {
@@ -123,6 +149,14 @@ export class EnvironmentsService {
 
   get GoogleScriptURL(): string {
     return this.configService.get('GAS_SCRIPT_URL');
+  }
+
+  get SlackBotSigningSecret(): string {
+    return this.configService.get('SLACK_SIGNING_SECRET');
+  }
+
+  get SlackBotToken(): string {
+    return this.configService.get('SLACK_BOT_TOKEN');
   }
 
   get isProduction(): boolean {
