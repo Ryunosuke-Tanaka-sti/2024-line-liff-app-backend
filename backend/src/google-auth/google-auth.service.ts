@@ -13,6 +13,7 @@ export class GoogleAuthService {
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/script.scriptapp',
         'https://www.googleapis.com/auth/script.external_request',
+        'https://www.googleapis.com/auth/spreadsheets',
       ],
       redirect_uri: this.env.GoogleRedirectUri,
     });
@@ -57,28 +58,43 @@ export class GoogleAuthService {
   //   expiry_date: 1743833416822
   // }
 
-  async test(access_token: string): Promise<any> {
+  // https://developers.google.com/apps-script/api/reference/rest/v1/scripts/run?hl=ja
+  async runScript(
+    accessToken: string,
+    functionName: 'healthCheckFunction' | 'getSheetAllData' | 'insertDataToTargetSheet',
+    parameters: (string | number)[] | undefined,
+  ): Promise<string | undefined | { url: string; content: string }[]> {
     const url = this.env.GoogleScriptURL;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        function: 'myFunction',
+        function: functionName,
+        parameters: parameters || [],
       }),
     });
     const data = await response.json();
-    if (response.status !== 200) {
+    if (response.status !== 200 || data.error) {
+      console.error('Error calling Google Apps Script:', data.error);
       throw new Error(`Error: ${data.error.message}`);
     }
-    console.log('response', data.response);
-    // response {
-    //   '@type': 'type.googleapis.com/google.apps.script.v1.ExecutionResponse',
-    //   result: 'Hello World!'
-    // }
-    console.log('response', data.response.result);
-    return response;
+
+    const result = data.response.result;
+
+    if (typeof result === 'undefined') return;
+    if (typeof result === 'string') return result;
+    if (Array.isArray(result)) {
+      const temp = result.map((item: { url: string; content: string }) => {
+        return {
+          url: item.url || '',
+          content: item.content || '',
+        };
+      });
+      return temp;
+    }
+    return result;
   }
 }
