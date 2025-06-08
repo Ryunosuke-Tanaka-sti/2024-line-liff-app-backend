@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Credentials } from 'google-auth-library';
 import { EnvironmentsService } from 'src/config/enviroments.service';
 
 @Injectable()
@@ -22,14 +23,12 @@ export class GoogleAuthService {
 
   async verfyIdToken(idToken: string): Promise<any> {
     const client = this.env.GoogleOAuth2Client();
-    console.log('idToken', idToken);
     try {
       const ticket = await client.verifyIdToken({
         idToken: idToken,
         audience: this.env.GoogleClientID,
       });
       const payload = ticket.getPayload();
-      console.log('payload', payload);
       const now = Math.floor(Date.now() / 1000); // 現在時刻（秒単位）
       if (payload && payload.exp && payload.exp > now) {
         return true; // トークンは有効
@@ -42,7 +41,7 @@ export class GoogleAuthService {
     }
   }
 
-  async getToken(code: string): Promise<any> {
+  async getToken(code: string): Promise<Credentials> {
     const client = this.env.GoogleOAuth2Client();
     const tmp = await client.getToken(code);
     console.log(tmp);
