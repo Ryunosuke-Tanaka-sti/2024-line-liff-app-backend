@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { IsGoogleIdTokenVerifyGuard } from 'src/common/guard/is-google-id-token-verify/is-google-id-token-verify.guard';
 import { EnvironmentsService } from 'src/config/enviroments.service';
 import { GoogleAuthService } from './google-auth.service';
+import { RequestScriptRunDto } from './dto/request.dto';
 
 @Controller('/api/google-auth/')
 export class GoogleAuthController {
@@ -12,9 +13,9 @@ export class GoogleAuthController {
 
   // Google認証のURLを取得する
   @Get()
-  async getGoogleAuthUrl(@Res() res): Promise<string> {
+  async getGoogleAuthUrl(@Res() res): Promise<void> {
     const authUrl = await this.googleAuthService.getGoogleAuthUrl();
-    return res.redirect(authUrl);
+    res.redirect(authUrl);
   }
 
   // Google認証のコールバックURL
@@ -61,13 +62,17 @@ export class GoogleAuthController {
     }
   }
 
-  @Get('test')
+  @Post('test')
   @UseGuards(IsGoogleIdTokenVerifyGuard)
-  async test(@Req() req, @Res() res): Promise<void> {
-    const access_token = req.cookies['access_token'];
-    console.log('access_token', access_token);
-    await this.googleAuthService.test(access_token);
+  async test(
+    @Req() req,
+    @Body() body: RequestScriptRunDto,
+    @Res() res,
+  ): Promise<string | undefined | { url: string; content: string }[]> {
+    const accessToken = req.cookies['access_token'];
+    console.log('accessToken', req);
+    const result = await this.googleAuthService.runScript(accessToken, body.functionName, body.params);
 
-    return res.status(200).json({ message: 'test' });
+    return res.status(200).json(result);
   }
 }
